@@ -1,8 +1,11 @@
 package com.example.client.service;
 
+import com.example.client.dto.Req;
 import com.example.client.dto.UserRequest;
 import com.example.client.dto.UserResponse;
-import org.apache.catalina.User;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -37,6 +40,7 @@ public class RestTemplateService {
     }
 
     public UserResponse post() {
+        // 어떤 형식일지 모를 때: public void post()
         // http://localhost:9090/api/server/user/{userId}/name/{userName}
 
         URI uri = UriComponentsBuilder
@@ -55,10 +59,78 @@ public class RestTemplateService {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<UserResponse> response = restTemplate.postForEntity(uri, req, UserResponse.class);
+        // 어떤 형식일지 모를 때: ResponseEntity<String> response = restTemplate.postForEntity(uri, req, String.class);
 
         System.out.println(response.getStatusCode());
         System.out.println(response.getHeaders());
         System.out.println(response.getBody());
+
+        return response.getBody();
+        // 어떤 형식일지 모를 때: No return
+    }
+
+    public UserResponse exchange() {
+        URI uri = UriComponentsBuilder
+                .fromUriString("http://localhost:9090")
+                .path("/api/server/user/{userId}/name/{userName}")
+                .encode()
+                .build()
+                .expand(100, "sora")
+                .toUri();
+        System.out.println(uri);
+
+        // http body --> object --> object mapper --> json --> rest template --> http body json
+        UserRequest req = new UserRequest();
+        req.setName("sora");
+        req.setAge(10);
+
+        RequestEntity<UserRequest> requestEntity = RequestEntity
+                .post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("x-authorization", "abcd")
+                .header("custom-header", "fffff")
+                .body(req);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<UserResponse> response = restTemplate.exchange(requestEntity, UserResponse.class);
+        return response.getBody();
+    }
+
+    public Req<UserResponse> genericExchange() {
+        URI uri = UriComponentsBuilder
+                .fromUriString("http://localhost:9090")
+                .path("/api/server/user/{userId}/name/{userName}")
+                .encode()
+                .build()
+                .expand(100, "sora")
+                .toUri();
+        System.out.println(uri);
+
+        // http body --> object --> object mapper --> json --> rest template --> http body json
+        UserRequest userRequest = new UserRequest();
+        userRequest.setName("sora");
+        userRequest.setAge(10);
+
+        Req<UserRequest> req = new Req<>();
+        req.setHeader(
+                new Req.Header()
+        );
+
+        req.setResBody(
+                userRequest
+        );
+
+        RequestEntity<Req<UserRequest>> requestEntity = RequestEntity
+                .post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("x-authorization", "abcd")
+                .header("custom-header", "fffff")
+                .body(req);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<Req<UserResponse>> response =
+                restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Req<UserResponse>>(){});
 
         return response.getBody();
     }
