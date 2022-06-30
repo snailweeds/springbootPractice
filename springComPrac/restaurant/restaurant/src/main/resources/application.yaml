@@ -1,0 +1,15 @@
+naver:
+  url:
+    search:
+      local: https://openapi.naver.com/v1/search/local.json
+      image: https://openapi.naver.com/v1/search/image
+  client:
+    id: wmFBUFc6VVeismpKUzdh
+    secret: FwT6bzIp1n
+
+#swagger를 실행시키기 위해 build.gradle/dependecies에 springfox starter에서 복사 붙여넣기 --> ERROR(NULL=>exit)
+#해결하기 위해 아래 코드를 활용해 상대적으로 업데이트된 springboot 버전과 swagger 등의 라이브러리 버전을 맞춰주기
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
