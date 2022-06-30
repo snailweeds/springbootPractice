@@ -38,8 +38,8 @@ public class ServerApiController {
 
         RequestEntity<Void> req = RequestEntity
                 .get(uri)
-                .header("X-Naver-Client-Id", "wmFBUFc6VVeismpKUzdh")
-                .header("X-Naver-Client-Secret", "FwT6bzIp1n")
+                .header("X-Naver-Client-Id", "NaverID")
+                .header("X-Naver-Client-Secret", "NaverSecret")
                 .build();
 
         ResponseEntity<String> result = restTemplate.exchange(req, String.class);
